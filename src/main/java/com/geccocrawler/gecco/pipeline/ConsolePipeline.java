@@ -9,7 +9,7 @@ public class ConsolePipeline implements Pipeline<SpiderBean> {
 
 	@Override
 	public void process(SpiderBean bean) {
-		System.out.println(JSON.toJSONString(bean));
+		System.out.println(JSON.toJSONString(bean) + ",");
 	}
 
 }
