@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -355,7 +356,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 	public void closeUnitlComplete() {
 		if (!loop) {
 			try {
-				cdl.await();
+				if(!cdl.await(15, TimeUnit.SECONDS)) {
+					engineStop();
+				}
 			} catch (InterruptedException e) {
 				log.error(e);
 			}
