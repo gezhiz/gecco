@@ -54,6 +54,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
 	private Scheduler scheduler;
 
+	/**
+	 * SpiderBeanFactroy会根据请求的url地址，匹配相应的SpiderBean，同时生成该SpiderBean的上下文SpiderBeanContext。上下文SpiderBeanContext会告知这个SpiderBean采用什么渲染器，采用那个下载器，渲染完成后采用哪些pipeline处理等相关上下文信息。
+	 */
 	private SpiderBeanFactory spiderBeanFactory;
 
 	private PipelineFactory pipelineFactory;
@@ -74,7 +77,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
 	private boolean loop;
 
-	private boolean mobile;
+	private boolean mobile;//配置网站是否通过手机引擎代理访问
 
 	private boolean debug;
 
@@ -224,7 +227,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		}
 		if (scheduler == null) {
 			if (loop) {
-				scheduler = new StartScheduler();
+				scheduler = new StartScheduler();//初始地址，FIFO的阻塞队列，深度优先策略
 			} else {
 				scheduler = new NoLoopStartScheduler();
 			}
@@ -240,6 +243,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 			threadCount = 1;
 		}
 		this.cdl = new CountDownLatch(threadCount);
+		//动态加载请求的配置文件
 		startsJson();
 		if (startRequests.isEmpty()) {
 			// startRequests不为空
@@ -357,7 +361,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		if (!loop) {
 			try {
 				if(!cdl.await(15, TimeUnit.SECONDS)) {
-					engineStop();
+					engineStop();//一直等待到所有抓取线程执行完毕
 				}
 			} catch (InterruptedException e) {
 				log.error(e);
